@@ -14,8 +14,8 @@ export async function POST(request: Request) {
     }
 
     const data = await resend.emails.send({
-      from: 'Rumu Studio <send@rumustudio.pt>', // Use o subdomínio configurado (send ou bounces)
-      to: ['u9233301471@gmail.com'], // O email onde VOCÊ quer receber os contactos
+      from: 'Rumu Studio <geral@rumustudio.pt>', // Use o subdomínio configurado (send ou bounces)
+      to:['u9233301471@gmail.com'], // O email onde VOCÊ quer receber os contactos
       replyTo: email as string,
       subject: `Novo contacto do site: ${name}`,
       html: `
