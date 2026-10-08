@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --background: #d3b890;
+  --foreground: #d3b890;
+}
+:root {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #d3b890;
+    --foreground: #d3b890;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  background:#d3b890;
+}
+.menu-text-color {
+  color: #050505; /* Substitua pela cor que você quiser */
+  /* opcional: pode adicionar mais estilos */
+  font-size: 10px; /* tamanho do texto */
+  font-weight: 500; 
+}
