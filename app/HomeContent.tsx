@@ -1,77 +1,19 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instagram, Linkedin, Youtube, MessageCirclePlus, Menu, X } from "lucide-react";
-
-const TOTAL_IMAGENS = 58;
-
-interface ProjectItem {
-  id: number;
-  src: string;
-  alt: string;
-  href: string;
-  width: number;
-  height: number;
-  type: "image" | "text_block";
-}
-
-// --- ALTERAÇÃO 1: Margem inferior (Vertical) ajustada para mb-1 (4px) ---
-const ProjectImage = ({ src, alt, width, height, href }: { src: string; alt: string; width: number; height: number; href: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.6, ease: "easeOut" }}
-    className="w-full mb-1" // <--- AQUI: Mudou de "mb-4 md:mb-6" para "mb-1"
-  >
-    <Link href={href} className="block w-full group relative">
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        sizes="(max-width: 768px) 100vw, 33vw"
-        className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
-      />
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
-    </Link>
-  </motion.div>
-);
+import { getGalleryItems, MediaItem } from "@/app/gallery/galleryConfig";
 
 export default function Home() {
-  const [showTitle, setShowTitle] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [gridItems, setGridItems] = useState<ProjectItem[]>([]);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [gridItems, setGridItems] = useState<MediaItem[]>([]);
 
   useEffect(() => {
-    const generateRandomDimensions = () => {
-      const isPortrait = Math.random() > 0.5;
-      return {
-        width: 800,
-        height: isPortrait ? 1200 : 600
-      };
-    };
-
-    const images: ProjectItem[] = Array.from({ length: TOTAL_IMAGENS }, (_, i) => {
-      const dims = generateRandomDimensions();
-      return {
-        id: i,
-        src: `/img${i + 1}.jpg`,
-        alt: `Project ${i + 1}`,
-        href: `/gallery?img=${i + 1}`,
-        width: dims.width,
-        height: dims.height,
-        type: "image"
-      };
-    });
-
-    setGridItems(images);
-
-    const timer = setTimeout(() => setShowTitle(false), 5000);
-    return () => clearTimeout(timer);
+    // Carrega a lista unificada e misturada de forma automática e segura
+    setGridItems(getGalleryItems());
   }, []);
 
   const getColumnItems = (colIndex: number, numCols: number) => {
@@ -80,85 +22,131 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#d3b890] w-full overflow-x-hidden font-satoshi">
-      
-      {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 w-full z-[100] px-6 py-6 md:px-8 md:py-10 flex justify-end items-center">
+      {/* ... (o seu código de Navbar, Logo e Footer mantém-se igual) ... */}
+
+      {/* GRID MASONRY */}
+      <nav className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-8 md:py-10 flex justify-end items-center">
+        
+        {/* Menu Desktop (Esconde no Mobile) */}
         <div className="hidden md:flex gap-6 px-7 py-1">
           <Link href="/" className="text-white text-lg font-bold uppercase tracking-[2px] hover:opacity-70 transition-opacity">Projects</Link>
           <Link href="/about" className="text-white text-lg font-bold uppercase tracking-[2px] hover:opacity-70 transition-opacity">About Us</Link>
           <Link href="/contact" className="text-white text-lg font-bold uppercase tracking-[2px] hover:opacity-70 transition-opacity">Contact Us</Link>
         </div>
-        <button onClick={() => setIsMenuOpen(true)} className="md:hidden text-white hover:opacity-70 transition-opacity">
+
+        {/* Botão Hambúrguer (Apenas Mobile) */}
+        <button 
+          onClick={() => setIsMenuOpen(true)}
+          className="md:hidden text-white hover:opacity-70 transition-opacity bg"
+        >
           <Menu size={35} strokeWidth={1.5} />
         </button>
+
+        {/* Menu Lateral Mobile Overlay */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
-              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed inset-0 bg-[#d3b890] z-[110] flex flex-col p-10 md:hidden"
             >
               <div className="flex justify-end">
-                <button onClick={() => setIsMenuOpen(false)} className="text-black"><X size={40} strokeWidth={1} /></button>
+                <button onClick={() => setIsMenuOpen(false)} className="text-black">
+                  <X size={40} strokeWidth={1} />
+                </button>
               </div>
-              <div className="flex flex-col gap-8 mt-20">
+              
+              <div className="flex flex-col gap-8 mt-20" >
                 <Link onClick={() => setIsMenuOpen(false)} href="/" className="text-black text-4xl font-black uppercase tracking-widest">Projects</Link>
                 <Link onClick={() => setIsMenuOpen(false)} href="/about" className="text-black text-4xl font-black uppercase tracking-widest">About Us</Link>
                 <Link onClick={() => setIsMenuOpen(false)} href="/contact" className="text-black text-4xl font-black uppercase tracking-widest">Contact Us</Link>
+              </div>
+
+              <div className="mt-auto flex gap-6 pb-10">
+                <Instagram size={28} strokeWidth={1} className="text-black" />
+                <Linkedin size={28} strokeWidth={1} className="text-black" />
+                <Youtube size={28} strokeWidth={1} className="text-black" />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </nav>
-
-      {/* LOGO */}
-      <div className="fixed top-6 left-6 z-[120]">
-  <Link href="/">
-    <Image 
-      src="/LOGO_PNG_BRANCO.png" 
-      alt="Logo" 
-      width={130} 
-      height={40} 
-      priority
-      className={`object-contain transition-all duration-500 ${isMenuOpen ? 'invert' : ''}`} 
-    />
-  </Link>
-</div>
-
-   
-
-
-     
-  {/* GRID MASONRY INTELIGENTE */}
- {/* GRID MASONRY INTELIGENTE */}
+        <div className="fixed top-6 left-6 z-[105] px-2 md:px-7 pointer-events-none">
+        <Link href="/">
+          <Image 
+            src="/LOGO_PNG_BRANCO.png" 
+            alt="Logo" 
+            width={130} 
+            height={40} 
+            priority
+            className={`object-contain pointer-events-auto transition-all duration-500 ${isMenuOpen ? 'invert' : ''}`} 
+          />
+        </Link>
+      </div>
       <section className="w-full px-0 py-1">
-        {/* CORREÇÃO: Mudei de 'gap-2' (8px) para 'gap-1' (4px) para igualar o 'mb-1' das imagens */}
-        <div className="flex flex-col md:flex-row gap-1"> 
-          
+        <div className="flex flex-col md:flex-row gap-1">
           {[0, 1, 2].map((colIndex) => (
             <div key={colIndex} className="flex-1 flex flex-col gap-0">
-              
-              {/* Bloco de Texto Fixo na Coluna do Meio */}
-            
+              {getColumnItems(colIndex, 3).map((item) => {
+                if (!item) return null;
 
-              {/* Itens da Coluna */}
-              {getColumnItems(colIndex, 3).map((item) => (
-                <ProjectImage 
-                  key={item.id} 
-                  src={item.src} 
-                  alt={item.alt} 
-                  width={item.width} 
-                  height={item.height}
-                  href={item.href} 
-                />
-              ))}
+                return item.type === "video" ? (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="w-full mb-1"
+                  >
+                    <Link href={item.href || "#"} className="block w-full group relative">
+                      <video
+                        src={item.src}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="auto"
+                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
+                        onEnded={(e) => {
+                          e.currentTarget.currentTime = 0;
+                          e.currentTarget.play();
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
+                    </Link>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="w-full mb-1"
+                  >
+                    <Link href={item.href || "#"} className="block w-full group relative">
+                      <Image
+                        src={item.src}
+                        alt={item.alt}
+                        width={item.width || 800}
+                        height={item.height || 600}
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           ))}
         </div>
       </section>
-
-      {/* FOOTER */}
-       <footer className="bg-[#d3b890] py-8 border-t border-black/5 font-satoshi">
+      {/* ... rodapé ... */}
+     <footer className="bg-[#d3b890] py-8 border-t border-black/5 font-satoshi">
         <div className="w-full flex flex-col md:flex-row justify-between items-center px-10 gap-6 md:gap-0">
           <p className="text-[10px] tracking-[0.2em] text-gray-500 uppercase font-medium">
             © 2025 Rumu Studio.

@@ -5,6 +5,28 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instagram, Linkedin, Youtube, MessageCirclePlus, Menu, X } from "lucide-react";
 
+// =====================================================
+// COMPONENTE AUXILIAR PARA TRANSIÇÃO SUAVE (CROSSFADE)
+// =====================================================
+const FadeImageItem = ({ src, alt, isActive }) => {
+  return (
+    <div
+      className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+      }`}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        priority={alt === "Project 1"}
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-cover"
+      />
+    </div>
+  );
+};
+
 export default function AboutPage() {
   const [currentImg, setCurrentImg] = useState(1);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,7 +57,7 @@ export default function AboutPage() {
         {/* Botão Hambúrguer (Apenas Mobile) */}
         <button 
           onClick={() => setIsMenuOpen(true)}
-          className="md:hidden text-white hover:opacity-70 transition-opacity bg"
+          className="md:hidden text-white hover:opacity-70 transition-opacity"
         >
           <Menu size={35} strokeWidth={1.5} />
         </button>
@@ -105,31 +127,22 @@ export default function AboutPage() {
               We are a studio focused on creating high-fidelity 3D visualizations for architecture and interiors.
               Our commitment is to transform concepts into visual realities.
               <br /><br />
-            Through technological innovation and a keen artistic eye, we help architects and designers communicate their visions in an impactful and comprehensive way.
+              Through technological innovation and a keen artistic eye, we help architects and designers communicate their visions in an impactful and comprehensive way.
             </p>
           </motion.div>
 
-          {/* CARROSSEL AUTOMÁTICO */}
-          <div className="relative w-full aspect-[4/5]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentImg}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.5 }}
-                className="relative w-full h-full"
-              >
-                <Image
-                  src={`/img${currentImg}.jpg`}
-                  alt={`Project ${currentImg}`}
-                  fill
-                  priority={currentImg === 1}
-                  className="object-cover"
-                />
-              </motion.div>
-            </AnimatePresence>
+          {/* CARROSSEL AUTOMÁTICO (SUPER SMOOTH / CROSSFADE) */}
+          <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#c9af88]">
+            {Array.from({ length: totalImages }, (_, i) => i + 1).map((imgIndex) => (
+              <FadeImageItem
+                key={`img-${imgIndex}`}
+                src={`/img${imgIndex}.jpg`}
+                alt={`Project ${imgIndex}`}
+                isActive={imgIndex === currentImg}
+              />
+            ))}
           </div>
+
         </div>
       </section>
 

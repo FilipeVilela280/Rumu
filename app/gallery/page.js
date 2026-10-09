@@ -1,32 +1,61 @@
 "use client";
-import { useSearchParams, useRouter } from "next/navigation"; // Importar useRouter
+
+import { useSearchParams, useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useRef } from "react";
+
+// CORRIGIDO: O caminho aponta para o ficheiro que está na mesma pasta (ou ajuste conforme a sua estrutura)
+import { getGalleryItems } from "./galleryConfig";
 
 // Estilos do Swiper
 import "swiper/css";
 import "swiper/css/navigation";
 
-// --- CORREÇÃO 1: O número de imagens deve ser igual ao da Home (93) ---
-const totalImages = 58; 
-const allImages = Array.from({ length: totalImages }, (_, i) => `/img${i + 1}.jpg`);
+const allMediaItems = getGalleryItems();
 
 function CarouselContent() {
   const searchParams = useSearchParams();
-  const router = useRouter(); // Hook para navegação
-  
+  const router = useRouter();
+
+  // Referência para guardar todos os elementos de vídeo e poder controlá-los
+  const videoRefs = useRef([]);
+
   const imgParam = searchParams.get("img");
-  // Se o param for maior que o total, volta ao 0 para evitar erros
-  const parsedIndex = imgParam ? parseInt(imgParam) - 1 : 0;
-  const initialImgIndex = (parsedIndex >= 0 && parsedIndex < totalImages) ? parsedIndex : 0;
+  const videoParam = searchParams.get("video");
+
+  let targetParamKey = "";
+  if (imgParam) {
+    targetParamKey = `img=${imgParam}`;
+  } else if (videoParam) {
+    targetParamKey = `video=${videoParam}`;
+  }
+
+  const initialIndex = allMediaItems.findIndex(
+    (item) => item.paramKey === targetParamKey
+  );
+
+  const activeIndex = initialIndex !== -1 ? initialIndex : 0;
+
+  // Função executada sempre que muda de slide no carrossel
+  const handleSlideChange = (swiper) => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+
+      if (index === swiper.activeIndex) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  };
 
   return (
     <main className="fixed inset-0 bg-white z-[200] flex items-center justify-center">
-      
-      {/* --- CORREÇÃO 2: Botão Back usa histórico do browser para não perder scroll --- */}
-      <button 
+      <button
         onClick={() => router.back()}
         className="absolute top-10 right-10 z-[300] text-black text-2xl font-light hover:opacity-50 transition-opacity bg-transparent border-none cursor-pointer"
       >
@@ -36,49 +65,67 @@ function CarouselContent() {
       <Swiper
         modules={[Navigation]}
         navigation={true}
-        initialSlide={initialImgIndex}
-        loop={true}
+        initialSlide={activeIndex}
+        loop={false}
+        onSlideChange={handleSlideChange}
+        onSwiper={(swiper) => {
+          setTimeout(() => handleSlideChange(swiper), 100);
+        }}
         className="w-full h-full"
       >
-        {allImages.map((src, index) => (
-          <SwiperSlide key={index} className="flex items-center justify-center p-4 md:p-20">
-            <div className="relative w-full h-full">
-              {/* Nota: Adicionei sizes para otimização */}
-              <Image
-                src={src}
-                alt={`Render ${index + 1}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 80vw"
-                className="object-contain"
-                priority={index === initialImgIndex}
-              />
+        {allMediaItems.map((item, index) => (
+          <SwiperSlide
+            key={item.id}
+            className="flex items-center justify-center p-4 md:p-20"
+          >
+            <div className="relative w-full h-full flex items-center justify-center">
+              {item.type === "video" ? (
+               <video
+  ref={(el) => {
+    videoRefs.current[index] = el;
+  }}
+  src={item.src}
+  autoPlay
+  controls
+  playsInline
+  preload="metadata"
+  className="max-w-full max-h-full object-contain"
+  onLoadedMetadata={(e) => {
+    // Verifica se a duração do vídeo é superior a 30 segundos
+    if (e.currentTarget.duration > 30) {
+      e.currentTarget.muted = false; // Tem mais de 30s: com áudio
+    } else {
+      e.currentTarget.muted = true;  // Tem 30s ou menos: fica mudo
+    }
+  }}
+/>
+              ) : (
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  className="object-contain"
+                  priority={index === activeIndex}
+                />
+              )}
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
-
-      <style jsx global>{`
-        .swiper-button-next, .swiper-button-prev {
-          color: #000 !important;
-          padding: 0 10px;
-        }
-        .swiper-button-next:after, .swiper-button-prev:after {
-          font-size: 24px !important;
-          font-weight: bold;
-        }
-        @media (max-width: 640px) {
-          .swiper-button-next, .swiper-button-prev {
-            display: none;
-          }
-        }
-      `}</style>
     </main>
   );
 }
 
 export default function GalleryPage() {
   return (
-    <Suspense fallback={<div className="bg-white h-screen w-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="bg-white h-screen w-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
       <CarouselContent />
     </Suspense>
   );
