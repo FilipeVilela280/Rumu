@@ -1,11 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instagram, Linkedin, Youtube, MessageCirclePlus, Menu, X } from "lucide-react";
 import { getGalleryItems, MediaItem } from "@/app/gallery/galleryConfig";
+
+// Componente auxiliar para garantir o autoplay fiável em produção (Vercel/Navegadores)
+function VideoPlayerItem({ src }: { src: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.log("Autoplay evitado pelo navegador:", error);
+      });
+    }
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
+    >
+      <source src={src} type="video/mp4" />
+      O seu navegador não suporta vídeos HTML5.
+    </video>
+  );
+}
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,9 +50,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#d3b890] w-full overflow-x-hidden font-satoshi">
-      {/* ... (o seu código de Navbar, Logo e Footer mantém-se igual) ... */}
-
-      {/* GRID MASONRY */}
+      
+      {/* NAVBAR RESPONSIVA */}
       <nav className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-8 md:py-10 flex justify-end items-center">
         
         {/* Menu Desktop (Esconde no Mobile) */}
@@ -37,7 +64,7 @@ export default function Home() {
         {/* Botão Hambúrguer (Apenas Mobile) */}
         <button 
           onClick={() => setIsMenuOpen(true)}
-          className="md:hidden text-white hover:opacity-70 transition-opacity bg"
+          className="md:hidden text-white hover:opacity-70 transition-opacity"
         >
           <Menu size={35} strokeWidth={1.5} />
         </button>
@@ -73,7 +100,9 @@ export default function Home() {
           )}
         </AnimatePresence>
       </nav>
-        <div className="fixed top-6 left-6 z-[105] px-2 md:px-7 pointer-events-none">
+
+      {/* LOGO FIXO ADAPTÁVEL */}
+      <div className="fixed top-6 left-6 z-[105] px-2 md:px-7 pointer-events-none">
         <Link href="/">
           <Image 
             src="/LOGO_PNG_BRANCO.png" 
@@ -85,7 +114,9 @@ export default function Home() {
           />
         </Link>
       </div>
-      <section className="w-full px-0 py-1">
+
+      {/* GRID MASONRY */}
+      <section className="w-full px-0 py-1 pt-32 md:pt-36">
         <div className="flex flex-col md:flex-row gap-1">
           {[0, 1, 2].map((colIndex) => (
             <div key={colIndex} className="flex-1 flex flex-col gap-0">
@@ -102,17 +133,7 @@ export default function Home() {
                     className="w-full mb-1"
                   >
                     <Link href={item.href || "#"} className="block w-full group relative">
-                    <video
-  autoPlay
-  muted
-  loop
-  playsInline
-  preload="auto"
-  className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
->
-  <source src={item.src} type="video/mp4" />
-  O seu navegador não suporta vídeos HTML5.
-</video>
+                      <VideoPlayerItem src={item.src} />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
                     </Link>
                   </motion.div>
@@ -143,8 +164,9 @@ export default function Home() {
           ))}
         </div>
       </section>
-      {/* ... rodapé ... */}
-     <footer className="bg-[#d3b890] py-8 border-t border-black/5 font-satoshi">
+
+      {/* FOOTER */}
+      <footer className="bg-[#d3b890] py-8 border-t border-black/5 font-satoshi">
         <div className="w-full flex flex-col md:flex-row justify-between items-center px-10 gap-6 md:gap-0">
           <p className="text-[10px] tracking-[0.2em] text-gray-500 uppercase font-medium">
             © 2025 Rumu Studio.
