@@ -103,21 +103,21 @@ export default function Home() {
                     className="w-full mb-1"
                   >
                     <Link href={item.href || "#"} className="block w-full group relative">
-                      <video
-                        src={item.src}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.error(
-                            "Erro ao carregar o vídeo:",
-                            e.currentTarget.currentSrc,
-                            e.currentTarget.error
-                          );
-                        }}
-                      >
+                   <video
+  src={item.src}
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="w-full h-full object-cover"
+  onError={(e) => {
+    console.error(
+      "Erro ao carregar o vídeo:",
+      e.currentTarget.currentSrc,
+      e.currentTarget.error
+    );
+  }}
+>
                         O seu navegador não suporta vídeos HTML5.
                       </video>
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />

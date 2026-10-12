@@ -1,5 +1,7 @@
 // src/data/galleryConfig.ts
 
+const R2_DOMAIN = "https://pub-950e208fb23d4df39b95328c7edb4264.r2.dev";
+
 export const TOTAL_IMAGENS = 58;
 
 export interface MediaItem {
@@ -13,19 +15,18 @@ export interface MediaItem {
   height?: number;
 }
 
-// Defina aqui a posição dos vídeos: "afterImageIndex" é o índice da imagem (0 a 57)
+// Definição da posição dos vídeos na galeria
 export const videoPlacements: { [afterIndex: number]: { src: string; alt: string; videoNumber: number } } = {
-  9:  { src: "/video1.mp4", alt: "Video Project 1", videoNumber: 1 },  // Após img 10 (index 9)
-  22: { src: "/video2.mp4", alt: "Video Project 2", videoNumber: 2 },  // Após img 23 (index 22)
-  36: { src: "/video3.mp4", alt: "Video Project 3", videoNumber: 3 },  // Após img 37 (index 36)
-  49: { src: "/video4.mp4", alt: "Video Project 4", videoNumber: 4 },  // Após img 50 (index 49)
-  53: { src: "/video5.mp4", alt: "Video Project 5", videoNumber: 5 },  // Após img 54 (index 53)
-5: { src: "/video6.mp4", alt: "Video Project 5", videoNumber: 6 },  // Após img 54 (index 53)
-  4: { src: "/video7.mp4", alt: "Video Project 5", videoNumber: 7 },  // Após img 54 (index 53)
-  // Se adicionar mais vídeos, basta adicioná-los aqui!
+  9:  { src: `${R2_DOMAIN}/video1.mp4`, alt: "Video Project 1", videoNumber: 1 },  // Após img 10 (index 9)
+  22: { src: `${R2_DOMAIN}/video2.mp4`, alt: "Video Project 2", videoNumber: 2 },  // Após img 23 (index 22)
+  36: { src: `${R2_DOMAIN}/video3.mp4`, alt: "Video Project 3", videoNumber: 3 },  // Após img 37 (index 36)
+  49: { src: `${R2_DOMAIN}/video4.mp4`, alt: "Video Project 4", videoNumber: 4 },  // Após img 50 (index 49)
+  53: { src: `${R2_DOMAIN}/video5.mp4`, alt: "Video Project 5", videoNumber: 5 },  // Após img 54 (index 53)
+  5:  { src: `${R2_DOMAIN}/video6.mp4`, alt: "Video Project 6", videoNumber: 6 },  // Após img 6
+  4:  { src: `${R2_DOMAIN}/video7.mp4`, alt: "Video Project 7", videoNumber: 7 },  // Após img 5
 };
 
-// Função única que gera a lista combinada para qualquer página usar
+// Função que gera a lista combinada de imagens e vídeos
 export const getGalleryItems = (): MediaItem[] => {
   const images = Array.from({ length: TOTAL_IMAGENS }, (_, i) => ({
     id: i + 1,
@@ -35,7 +36,7 @@ export const getGalleryItems = (): MediaItem[] => {
     href: `/gallery?img=${i + 1}`,
     paramKey: `img=${i + 1}`,
     width: 800,
-    height: Math.random() > 0.5 ? 1200 : 600, // Altura dinâmica se precisar
+    height: Math.random() > 0.5 ? 1200 : 600,
   }));
 
   const combined: MediaItem[] = [];
@@ -43,7 +44,7 @@ export const getGalleryItems = (): MediaItem[] => {
   images.forEach((image, index) => {
     combined.push(image);
 
-    // Verifica se existe algum vídeo programado para entrar após esta imagem
+    // Insere o vídeo correspondente se houver um posicionado após esta imagem
     const videoData = videoPlacements[index];
     if (videoData) {
       combined.push({
