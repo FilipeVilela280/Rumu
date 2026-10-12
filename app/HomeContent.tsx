@@ -22,11 +22,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#d3b890] w-full overflow-x-hidden font-satoshi">
-      {/* ... (o seu código de Navbar, Logo e Footer mantém-se igual) ... */}
-
-      {/* GRID MASONRY */}
+      {/* Navbar Desktop e Mobile */}
       <nav className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-8 md:py-10 flex justify-end items-center">
-
         {/* Menu Desktop (Esconde no Mobile) */}
         <div className="hidden md:flex gap-6 px-7 py-1">
           <Link href="/" className="text-white text-lg font-bold uppercase tracking-[2px] hover:opacity-70 transition-opacity">Projects</Link>
@@ -37,7 +34,7 @@ export default function Home() {
         {/* Botão Hambúrguer (Apenas Mobile) */}
         <button
           onClick={() => setIsMenuOpen(true)}
-          className="md:hidden text-white hover:opacity-70 transition-opacity bg"
+          className="md:hidden text-white hover:opacity-70 transition-opacity"
         >
           <Menu size={35} strokeWidth={1.5} />
         </button>
@@ -58,7 +55,7 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="flex flex-col gap-8 mt-20" >
+              <div className="flex flex-col gap-8 mt-20">
                 <Link onClick={() => setIsMenuOpen(false)} href="/" className="text-black text-4xl font-black uppercase tracking-widest">Projects</Link>
                 <Link onClick={() => setIsMenuOpen(false)} href="/about" className="text-black text-4xl font-black uppercase tracking-widest">About Us</Link>
                 <Link onClick={() => setIsMenuOpen(false)} href="/contact" className="text-black text-4xl font-black uppercase tracking-widest">Contact Us</Link>
@@ -73,6 +70,8 @@ export default function Home() {
           )}
         </AnimatePresence>
       </nav>
+
+      {/* Logótipo Fixo */}
       <div className="fixed top-6 left-6 z-[105] px-2 md:px-7 pointer-events-none">
         <Link href="/">
           <Image
@@ -85,6 +84,8 @@ export default function Home() {
           />
         </Link>
       </div>
+
+      {/* Grelha Masonry */}
       <section className="w-full px-0 py-1">
         <div className="flex flex-col md:flex-row gap-1">
           {[0, 1, 2].map((colIndex) => (
@@ -102,15 +103,13 @@ export default function Home() {
                     className="w-full mb-1"
                   >
                     <Link href={item.href || "#"} className="block w-full group relative">
-
                       <video
+                        src={item.src}
                         autoPlay
-                        muted
                         loop
+                        muted
                         playsInline
-                        preload="metadata"
-                        controls
-                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           console.error(
                             "Erro ao carregar o vídeo:",
@@ -119,7 +118,6 @@ export default function Home() {
                           );
                         }}
                       >
-                        <source src={item.src} type="video/mp4" />
                         O seu navegador não suporta vídeos HTML5.
                       </video>
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
@@ -152,7 +150,8 @@ export default function Home() {
           ))}
         </div>
       </section>
-      {/* ... rodapé ... */}
+
+      {/* Rodapé */}
       <footer className="bg-[#d3b890] py-8 border-t border-black/5 font-satoshi">
         <div className="w-full flex flex-col md:flex-row justify-between items-center px-10 gap-6 md:gap-0">
           <p className="text-[10px] tracking-[0.2em] text-gray-500 uppercase font-medium">
