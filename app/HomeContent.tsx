@@ -102,19 +102,17 @@ export default function Home() {
                     className="w-full mb-1"
                   >
                     <Link href={item.href || "#"} className="block w-full group relative">
-                      <video
-                        src={item.src}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="auto"
-                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
-                        onEnded={(e) => {
-                          e.currentTarget.currentTime = 0;
-                          e.currentTarget.play();
-                        }}
-                      />
+                    <video
+  autoPlay
+  muted
+  loop
+  playsInline
+  preload="auto"
+  className="w-full h-auto object-cover transition-transform duration-700 group-hover:brightness-90"
+>
+  <source src={item.src} type="video/mp4" />
+  O seu navegador não suporta vídeos HTML5.
+</video>
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-white/10 transition-colors duration-300 pointer-events-none" />
                     </Link>
                   </motion.div>
